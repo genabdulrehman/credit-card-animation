@@ -16,6 +16,7 @@ class MyApp extends StatelessWidget {
       title: 'Credit Card Animation',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        fontFamily: "ocr-a",
       ),
       home: CreditCard(),
     );
@@ -144,6 +145,7 @@ class _CardSliderState extends State<CardSlider> {
                     "5434 3443 654453",
                     style: TextStyle(
                         color: Colors.white,
+                        letterSpacing: 2.5,
                         fontSize: 12,
                         fontWeight: FontWeight.w700),
                   ),
@@ -157,8 +159,38 @@ class _CardSliderState extends State<CardSlider> {
                     cardInfo.userName,
                     style: TextStyle(
                         color: Colors.white,
+                        letterSpacing: 2.5,
                         fontSize: 12,
                         fontWeight: FontWeight.w700),
+                  ),
+                ),
+
+                // * sim card
+
+                Positioned(
+                  left: 0,
+                  top: 70,
+                  child: Row(
+                    children: [
+                      Container(
+                        height: 40,
+                        width: 80,
+                        // color: Colors.deepOrange,
+                        child: Image.asset(
+                          "assets/sim.png",
+                          fit: BoxFit.fill,
+                        ),
+                      ),
+                      Container(
+                        height: 20,
+                        width: 25,
+                        child: Image.asset(
+                          "assets/signal.png",
+                          fit: BoxFit.contain,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
 
