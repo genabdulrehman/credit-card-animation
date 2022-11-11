@@ -242,6 +242,7 @@ class _CardSliderState extends State<CardSlider> {
     //   updatePosition(cardInfo, firstCardAreaIdx, 0);
     //   setState(() {
     //     // cardInfo.positionY += offsetY;
+    //
     //   });
     // }
   }
