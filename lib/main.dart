@@ -59,6 +59,9 @@ class _CardSliderState extends State<CardSlider> {
   late double positionY_line1;
   late double positionY_line2;
   late List<CardInfo> _cardInfoList;
+  late double _middleAreaHeight;
+  late double _outsiteCardInterval;
+  late double scrollOffsetY;
 
   @override
   void initState() {
@@ -66,6 +69,10 @@ class _CardSliderState extends State<CardSlider> {
     super.initState();
     positionY_line1 = widget.height * 0.1;
     positionY_line2 = positionY_line1 + 200;
+
+    _middleAreaHeight = positionY_line2 - positionY_line1;
+    _outsiteCardInterval = 30.0;
+    scrollOffsetY = 0.0;
 
     _cardInfoList = [
       CardInfo(
@@ -214,114 +221,146 @@ class _CardSliderState extends State<CardSlider> {
     return widgetList;
   }
 
+  // * position update function
+
+  void _updateCardPosition(double offsetY) {
+    scrollOffsetY += offsetY;
+
+    void updatePosition(CardInfo cardInfo, double firstCardAreaIdx, int index) {
+      cardInfo.positionY += offsetY;
+    }
+
+    double firstCardAreaIdx = scrollOffsetY / _middleAreaHeight;
+    print(firstCardAreaIdx);
+    setState(() {
+      CardInfo cardInfo = _cardInfoList.last;
+      updatePosition(cardInfo, firstCardAreaIdx, 0);
+    });
+
+    // for (int i = 0; i < _cardInfoList.length; i++) {
+    //   CardInfo cardInfo = _cardInfoList[i];
+    //   updatePosition(cardInfo, firstCardAreaIdx, 0);
+    //   setState(() {
+    //     // cardInfo.positionY += offsetY;
+    //   });
+    // }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      color: Color.fromARGB(255, 230, 228, 232),
-      child: Stack(alignment: Alignment.topCenter, children: [
-        // * top title
-        Align(
-          alignment: Alignment.topCenter,
-          child: Padding(
-            padding: const EdgeInsets.only(top: 30),
-            child: Text(
-              "YOUR SECURED CARD",
-              style: TextStyle(
-                  color: Colors.grey.shade700,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700),
+    return GestureDetector(
+      onVerticalDragUpdate: (DragUpdateDetails d) {
+        // print(d.delta.dy);
+
+        _updateCardPosition(d.delta.dy);
+      },
+      child: Container(
+        width: MediaQuery.of(context).size.width,
+        color: Color.fromARGB(255, 230, 228, 232),
+        child: Stack(alignment: Alignment.topCenter, children: [
+          // * top title
+          Align(
+            alignment: Alignment.topCenter,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 30),
+              child: Text(
+                "YOUR SECURED CARD",
+                style: TextStyle(
+                    color: Colors.grey.shade700,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700),
+              ),
+            ),
+          )
+          // * line 1
+          ,
+          // Positioned(
+          //   top: positionY_line1,
+          //   child: Container(
+          //     height: 1,
+          //     width: MediaQuery.of(context).size.width,
+          //     color: Colors.red,
+          //   ),
+          // ),
+
+          ..._cardBuild(),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              height: 240,
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                    Color.fromARGB(0, 255, 255, 255),
+                    Color.fromARGB(255, 255, 255, 255),
+                  ])),
             ),
           ),
-        )
-        // * line 1
-        ,
-        // Positioned(
-        //   top: positionY_line1,
-        //   child: Container(
-        //     height: 1,
-        //     width: MediaQuery.of(context).size.width,
-        //     color: Colors.red,
-        //   ),
-        // ),
+          // * line 2
+          // Positioned(
+          //   top: positionY_line2,
+          //   child: Container(
+          //     height: 1,
+          //     width: MediaQuery.of(context).size.width,
+          //     color: Colors.red,
+          //   ),
+          // ),
 
-        ..._cardBuild(),
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: Container(
-            height: 240,
-            decoration: BoxDecoration(
-                gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                  Color.fromARGB(0, 255, 255, 255),
-                  Color.fromARGB(255, 255, 255, 255),
-                ])),
-          ),
-        ),
-        // * line 2
-        // Positioned(
-        //   top: positionY_line2,
-        //   child: Container(
-        //     height: 1,
-        //     width: MediaQuery.of(context).size.width,
-        //     color: Colors.red,
-        //   ),
-        // ),
-
-        // * bottom row
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: Padding(
-            padding: const EdgeInsets.only(left: 30, right: 30, bottom: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                FloatingActionButton(
-                  onPressed: () {},
-                  child: Icon(
-                    Icons.keyboard,
-                    color: Colors.grey,
-                    size: 35,
-                  ),
-                  backgroundColor: Colors.white,
-                ),
-                TextButton(
+          // * bottom row
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 30, right: 30, bottom: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  FloatingActionButton(
                     onPressed: () {},
-                    child: Container(
-                      height: 60,
-                      width: 200,
-                      decoration: ShapeDecoration(shadows: [
-                        BoxShadow(
-                            color: Color.fromARGB(100, 75, 136, 230),
-                            blurRadius: 10,
-                            offset: Offset(0, 10))
-                      ], shape: StadiumBorder(), color: Colors.blue),
-                      child: Center(
-                        child: Text(
-                          "Confirm \$5400",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700),
-                        ),
-                      ),
-                    )),
-                FloatingActionButton(
-                  onPressed: () {},
-                  child: Icon(
-                    Icons.mic,
-                    color: Colors.grey,
-                    size: 35,
+                    child: Icon(
+                      Icons.keyboard,
+                      color: Colors.grey,
+                      size: 35,
+                    ),
+                    backgroundColor: Colors.white,
                   ),
-                  backgroundColor: Colors.white,
-                )
-              ],
+                  TextButton(
+                      onPressed: () {},
+                      child: Container(
+                        height: 60,
+                        width: 200,
+                        decoration: ShapeDecoration(shadows: [
+                          BoxShadow(
+                              color: Color.fromARGB(100, 75, 136, 230),
+                              blurRadius: 10,
+                              offset: Offset(0, 10))
+                        ], shape: StadiumBorder(), color: Colors.blue),
+                        child: Center(
+                          child: Text(
+                            "Confirm \$5400",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700),
+                          ),
+                        ),
+                      )),
+                  FloatingActionButton(
+                    onPressed: () {},
+                    child: Icon(
+                      Icons.mic,
+                      color: Colors.grey,
+                      size: 35,
+                    ),
+                    backgroundColor: Colors.white,
+                  )
+                ],
+              ),
             ),
-          ),
-        )
-      ]),
+          )
+        ]),
+      ),
     );
   }
 }
