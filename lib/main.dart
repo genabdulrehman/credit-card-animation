@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:animate_do/animate_do.dart';
+import 'package:blurrycontainer/blurrycontainer.dart';
 import 'package:flutter/material.dart';
 
 import 'package:credit_card_animation/model/card_model.dart';
@@ -16,6 +17,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Credit Card Animation',
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -49,17 +51,20 @@ class _CreditCardState extends State<CreditCard>
     _animationController.forward();
   }
 
+  int _selectedIndex = 0;
+
+  List<String> _tabs = ["Home", "Finance", "Cards", "Crypto", "History"];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       // backgroundColor: Colors.black,
       body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             height: 300,
             width: double.infinity,
-            padding: EdgeInsets.only(top: 60, right: 20, left: 20),
+            padding: EdgeInsets.only(top: 60, right: 25, left: 20),
             decoration: BoxDecoration(
               color: Color(0xFF0B258A),
               borderRadius:
@@ -97,13 +102,113 @@ class _CreditCardState extends State<CreditCard>
                         // shape: BoxShape.circle,
                         borderRadius: BorderRadius.circular(10),
                         color: Colors.white.withOpacity(.4),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(.5),
+                        ),
                         image: DecorationImage(
-                            image: AssetImage("assets/img.JPG"))),
+                            image: AssetImage("assets/IMG_5706.JPG"))),
                     // child: Center(child: ),
                   )
                 ],
               ),
+              SizedBox(
+                height: 20,
+              ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Hi, Abdulrehman",
+                  style: GoogleFonts.aBeeZee(
+                      fontSize: 25,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600),
+                ),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Flash(
+                child: BlurryContainer(
+                  child: Center(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Your Balance",
+                          style: GoogleFonts.aBeeZee(
+                              fontSize: 14,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(),
+                          child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "\$ 543,933.33",
+                                  style: GoogleFonts.poppins(
+                                      fontSize: 25,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                Container(
+                                    height: 35,
+                                    width: 35,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      Icons.currency_bitcoin,
+                                      color: Color(0xFF0B258A),
+                                    ))
+                              ]),
+                        ),
+                      ],
+                    ),
+                  ),
+                  blur: 50,
+                  width: 300,
+                  height: 100,
+                  elevation: 0,
+                  color: Colors.grey.withOpacity(.4),
+                  padding: const EdgeInsets.only(left: 15, right: 15),
+                  borderRadius: const BorderRadius.all(Radius.circular(20)),
+                ),
+              ),
             ]),
+          ),
+          Spacer(),
+          Container(
+            height: 50,
+            child: ListView.builder(
+                itemCount: _tabs.length,
+                scrollDirection: Axis.horizontal,
+                itemBuilder: ((context, index) {
+                  return SlideInLeft(
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 20),
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _selectedIndex = index;
+                          });
+                        },
+                        child: Text(
+                          _tabs[index],
+                          style: GoogleFonts.poppins(
+                              fontSize: 25,
+                              color: index == _selectedIndex
+                                  ? Color(0xFF0B258A)
+                                  : Color(0xFF0B258A).withOpacity(.5),
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ),
+                  );
+                })),
           ),
           Spacer(),
           Align(
@@ -112,7 +217,7 @@ class _CreditCardState extends State<CreditCard>
               height: MediaQuery.of(context).size.height * .55,
               // color: Color.fromARGB(255, 230, 228, 232),
               // color: Colors.amber,
-              child: SlideInDown(
+              child: SlideInUp(
                 child: CardSlider(
                   height: MediaQuery.of(context).size.height * .6,
                   confirm: (confirm) {
@@ -169,18 +274,37 @@ class _CardSliderState extends State<CardSlider> {
       ),
       CardInfo(
         userName: "ABDUL REHMAN",
-        leftColor: Color.fromARGB(255, 171, 51, 75),
-        rightColor: Color.fromARGB(255, 224, 63, 92),
-      ),
-      CardInfo(
-        userName: "ABDUL REHMAN",
         leftColor: Color.fromARGB(255, 10, 10, 10),
         rightColor: Color.fromARGB(255, 10, 10, 10),
       ),
       CardInfo(
         userName: "ABDUL REHMAN",
+        leftColor: Colors.pinkAccent,
+        rightColor: Colors.pinkAccent,
+      ),
+      CardInfo(
+          userName: "ABDUL REHMAN",
+          leftColor: Color(0xFF0B258A),
+          rightColor: Color.fromARGB(255, 49, 69, 147)),
+      CardInfo(
+        userName: "ABDUL REHMAN",
+        leftColor: Colors.red,
+        rightColor: Colors.redAccent,
+      ),
+      CardInfo(
+        userName: "ABDUL REHMAN",
+        leftColor: Color.fromARGB(255, 229, 190, 35),
+        rightColor: Colors.redAccent,
+      ),
+      CardInfo(
+        userName: "ABDUL REHMAN",
         leftColor: Color.fromARGB(255, 85, 137, 234),
         rightColor: Color.fromARGB(255, 10, 10, 10),
+      ),
+      CardInfo(
+        userName: "ABDUL REHMAN",
+        leftColor: Color.fromARGB(255, 171, 51, 75),
+        rightColor: Color.fromARGB(255, 224, 63, 92),
       ),
     ];
 
@@ -258,7 +382,18 @@ class _CardSliderState extends State<CardSlider> {
                         fontWeight: FontWeight.w700),
                   ),
                 ),
-
+                // * network
+                Positioned(
+                  top: 30,
+                  right: 70,
+                  child: SizedBox(
+                      height: 70,
+                      width: 70,
+                      child: Image.asset(
+                        "assets/globe.png",
+                        // color: Colors.go,
+                      )),
+                ),
                 // * sim card
 
                 Positioned(
@@ -411,11 +546,11 @@ class _CardSliderState extends State<CardSlider> {
           Align(
             alignment: Alignment.topCenter,
             child: Padding(
-              padding: const EdgeInsets.only(top: 30),
+              padding: const EdgeInsets.only(top: 20),
               child: Text(
                 "YOUR SECURED CARD",
                 style: TextStyle(
-                    color: Colors.grey.shade700,
+                    color: Color.fromARGB(255, 18, 71, 162),
                     fontSize: 16,
                     fontWeight: FontWeight.w700),
               ),
