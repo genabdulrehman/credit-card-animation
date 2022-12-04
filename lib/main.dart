@@ -1,7 +1,10 @@
 import 'dart:math';
 
-import 'package:credit_card_animation/model/card_model.dart';
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
+
+import 'package:credit_card_animation/model/card_model.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,18 +33,96 @@ class CreditCard extends StatefulWidget {
   State<CreditCard> createState() => _CreditCardState();
 }
 
-class _CreditCardState extends State<CreditCard> {
+class _CreditCardState extends State<CreditCard>
+    with SingleTickerProviderStateMixin {
+  bool _confirm = false;
+  late AnimationController _animationController;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 3),
+    );
+
+    _animationController.forward();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
-      body: Align(
-        alignment: Alignment.bottomCenter,
-        child: Container(
-          height: MediaQuery.of(context).size.height * .6,
-          // color: Color.fromARGB(255, 230, 228, 232),
-          child: CardSlider(height: MediaQuery.of(context).size.height * .6),
-        ),
+      // backgroundColor: Colors.black,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            height: 300,
+            width: double.infinity,
+            padding: EdgeInsets.only(top: 60, right: 20, left: 20),
+            decoration: BoxDecoration(
+              color: Color(0xFF0B258A),
+              borderRadius:
+                  BorderRadius.only(bottomRight: Radius.circular(100)),
+            ),
+            child: Column(children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    height: 45,
+                    width: 45,
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white.withOpacity(.4)),
+                    child: Center(
+                        child: Icon(
+                      Icons.arrow_back_ios_new_sharp,
+                      color: Colors.white,
+                      size: 20,
+                    )),
+                  ),
+                  // Spacer(),
+                  Text(
+                    "Select Card",
+                    style: GoogleFonts.poppins(
+                        fontSize: 25,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600),
+                  ),
+                  Container(
+                    height: 50,
+                    width: 50,
+                    decoration: BoxDecoration(
+                        // shape: BoxShape.circle,
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.white.withOpacity(.4),
+                        image: DecorationImage(
+                            image: AssetImage("assets/img.JPG"))),
+                    // child: Center(child: ),
+                  )
+                ],
+              ),
+            ]),
+          ),
+          Spacer(),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              height: MediaQuery.of(context).size.height * .55,
+              // color: Color.fromARGB(255, 230, 228, 232),
+              // color: Colors.amber,
+              child: SlideInDown(
+                child: CardSlider(
+                  height: MediaQuery.of(context).size.height * .6,
+                  confirm: (confirm) {
+                    _confirm = confirm;
+                  },
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -49,7 +130,12 @@ class _CreditCardState extends State<CreditCard> {
 
 class CardSlider extends StatefulWidget {
   final double height;
-  const CardSlider({super.key, required this.height});
+  final Function(bool) confirm;
+  const CardSlider({
+    Key? key,
+    required this.height,
+    required this.confirm,
+  }) : super(key: key);
 
   @override
   State<CardSlider> createState() => _CardSliderState();
@@ -69,6 +155,7 @@ class _CardSliderState extends State<CardSlider> {
     super.initState();
     positionY_line1 = widget.height * 0.1;
     positionY_line2 = positionY_line1 + 200;
+    widget.confirm(false);
 
     _middleAreaHeight = positionY_line2 - positionY_line1;
     _outsiteCardInterval = 30.0;
@@ -227,24 +314,76 @@ class _CardSliderState extends State<CardSlider> {
     scrollOffsetY += offsetY;
 
     void updatePosition(CardInfo cardInfo, double firstCardAreaIdx, int index) {
-      cardInfo.positionY += offsetY;
+      // cardInfo.positionY += offsetY;
+      double currentCardAreaIdx = firstCardAreaIdx + index;
+      if (currentCardAreaIdx < 0) {
+        cardInfo.positionY = positionY_line1 + currentCardAreaIdx * 5;
+
+        cardInfo.scale =
+            1.0 - 0.2 / 10 * (positionY_line1 - cardInfo.positionY);
+
+        if (cardInfo.scale < 0.8) cardInfo.scale = 0.8;
+        if (cardInfo.scale > 1) cardInfo.scale = 1.0;
+
+        // * rotate card
+        cardInfo.rotate = -90.0 / 5 * (positionY_line1 - cardInfo.positionY);
+
+        if (cardInfo.rotate > 0.0) cardInfo.rotate = 0.0;
+        if (cardInfo.rotate < -90.0) cardInfo.rotate = -90.0;
+
+        // Opacity 1.0 --> 0.7
+        cardInfo.opacity =
+            1.0 - 0.7 / 5 * (positionY_line1 - cardInfo.positionY);
+
+        if (cardInfo.opacity < 0.0) cardInfo.opacity = 0.0;
+        if (cardInfo.opacity > 1) cardInfo.opacity = 1.0;
+      } else if (currentCardAreaIdx >= 0 && currentCardAreaIdx < 1) {
+        cardInfo.scale = 1.0 -
+            0.1 /
+                (positionY_line2 - positionY_line1) *
+                (cardInfo.positionY - positionY_line1);
+        if (cardInfo.scale < 0.9) cardInfo.scale = 0.9;
+        if (cardInfo.scale > 1) cardInfo.scale = 1.0;
+        // move 1:1
+        cardInfo.positionY =
+            positionY_line1 + currentCardAreaIdx * _middleAreaHeight;
+        // * rotate card
+        cardInfo.rotate = -60.0 /
+            (positionY_line2 - positionY_line1) *
+            (cardInfo.positionY - positionY_line1);
+        if (cardInfo.rotate > 0.0) cardInfo.rotate = 0.0;
+        if (cardInfo.rotate < -60.0) cardInfo.rotate = -60.0;
+
+        // Opacity
+        cardInfo.opacity = 1.0 -
+            0.3 /
+                (positionY_line2 - positionY_line1) *
+                (cardInfo.positionY - positionY_line1);
+        if (cardInfo.opacity < 0.0) cardInfo.opacity = 0.0;
+        if (cardInfo.opacity > 1) cardInfo.opacity = 1.0;
+      } else if (currentCardAreaIdx >= 1) {
+        cardInfo.positionY =
+            positionY_line2 + (currentCardAreaIdx - 1) * _outsiteCardInterval;
+        cardInfo.rotate = -60.0;
+        cardInfo.scale = 0.9;
+        cardInfo.opacity = 0.7;
+      }
     }
 
     double firstCardAreaIdx = scrollOffsetY / _middleAreaHeight;
     print(firstCardAreaIdx);
     setState(() {
-      CardInfo cardInfo = _cardInfoList.last;
-      updatePosition(cardInfo, firstCardAreaIdx, 0);
+      // CardInfo cardInfo = _cardInfoList.last;
+      // updatePosition(cardInfo, firstCardAreaIdx, 0);
     });
 
-    // for (int i = 0; i < _cardInfoList.length; i++) {
-    //   CardInfo cardInfo = _cardInfoList[i];
-    //   updatePosition(cardInfo, firstCardAreaIdx, 0);
-    //   setState(() {
-    //     // cardInfo.positionY += offsetY;
-    //
-    //   });
-    // }
+    for (int i = 0; i < _cardInfoList.length; i++) {
+      CardInfo cardInfo = _cardInfoList[_cardInfoList.length - 1 - i];
+      updatePosition(cardInfo, firstCardAreaIdx, i);
+      setState(() {
+        // cardInfo.positionY += offsetY;
+      });
+    }
   }
 
   @override
@@ -255,9 +394,18 @@ class _CardSliderState extends State<CardSlider> {
 
         _updateCardPosition(d.delta.dy);
       },
+      onVerticalDragEnd: (DragEndDetails d) {
+        scrollOffsetY =
+            (scrollOffsetY / _middleAreaHeight).round() * _middleAreaHeight;
+        _updateCardPosition(0);
+      },
       child: Container(
         width: MediaQuery.of(context).size.width,
-        color: Color.fromARGB(255, 230, 228, 232),
+        // color: Color.fromARGB(255, 230, 228, 232),
+        decoration: BoxDecoration(
+            color: Color(0xFF0B258A).withOpacity(.1),
+            borderRadius: BorderRadius.only(topLeft: Radius.circular(100))),
+        // color: Colors.amber,
         child: Stack(alignment: Alignment.topCenter, children: [
           // * top title
           Align(
@@ -327,16 +475,23 @@ class _CardSliderState extends State<CardSlider> {
                     backgroundColor: Colors.white,
                   ),
                   TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        widget.confirm(true);
+                        print("tab");
+                      },
                       child: Container(
                         height: 60,
                         width: 200,
-                        decoration: ShapeDecoration(shadows: [
-                          BoxShadow(
-                              color: Color.fromARGB(100, 75, 136, 230),
-                              blurRadius: 10,
-                              offset: Offset(0, 10))
-                        ], shape: StadiumBorder(), color: Colors.blue),
+                        decoration: ShapeDecoration(
+                          shadows: [
+                            BoxShadow(
+                                color: Color(0xFF0B258A).withOpacity(.5),
+                                blurRadius: 10,
+                                offset: Offset(0, 10))
+                          ],
+                          shape: StadiumBorder(),
+                          color: Color(0xFF0B258A),
+                        ),
                         child: Center(
                           child: Text(
                             "Confirm \$5400",
